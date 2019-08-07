@@ -29,7 +29,7 @@
          $errors['confirm'] = "There are still errors";
      } else {
          sendMail($email, $name, $msg, $login);
-        //  $errors['confirm'] = "Email is sent";
+         $errors['confirm'] = "Email is sent";
      }
  }
 
@@ -65,7 +65,7 @@ function sendMail($email, $name, $msg, $login){
 
         $mail->send();
     } catch (Exception $e) {
-        $errors['confirm'] = "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
+        echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
     }
 }
 
