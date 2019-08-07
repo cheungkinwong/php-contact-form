@@ -1,0 +1,30 @@
+* {
+     margin: 0;
+     font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande", "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
+}
+
+body {
+     height: 100vh;
+     width: 100vw;
+     display: flex;
+     justify-content: center;
+     align-items: center;
+}
+.container {
+     border: 2px solid black;
+     padding: 1rem;
+}
+
+form {
+     display: flex;
+     flex-flow: column wrap;
+     justify-content: stretch;
+     align-items: space-between;
+}
+input {
+     width: 100%;
+}
+textarea {
+     height: 5rem;
+     width: 100%;
+}
