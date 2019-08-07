@@ -2,10 +2,37 @@
  use PHPMailer\PHPMailer\PHPMailer;
  use PHPMailer\PHPMailer\Exception;
  require './vendor/autoload.php';
-$configArray = require 'config.php';
-$login = $configArray['login'];
+ $configArray = require 'config.php';
+ $login = $configArray['login'];
+ $errors = [];
+ 
+ if ($_SERVER["REQUEST_METHOD"] == "POST") {
+     // 1. Sanitisation
+     $email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
+     $name = test_input($_POST['fullname']);
+     $msg = test_input($_POST['msg']);
+ 
+     // 2. Validation    
+     if (empty($name)) {
+         $errors['fullname'] = "Name is required. <br />";
+     } else if (!preg_match("/^([a-zA-Z' ]+)$/", $name)){
+         $errors['fullname'] = "This name is invalid. <br />";
+     }
+     if (empty($email)) {
+         $errors['email'] = "Email is required <br />";
+     } else if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+         $errors['email'] = "Invalid email format <br />"; 
+     }
+ 
+     // 3. execution
+     if (count($errors)> 0){
+         $errors['confirm'] = "There are still errors";
+     } else {
+         sendMail($email, $name, $msg, $login);
+        //  $errors['confirm'] = "Email is sent";
+     }
+ }
 
-$errors = [];
 function test_input($data) {
     $data = trim($data);
     $data = stripslashes($data);
@@ -15,7 +42,6 @@ function test_input($data) {
 
 function sendMail($email, $name, $msg, $login){
     $headers = "From: $name, $email";
-    // Instantiation and passing `true` enables exceptions
     $mail = new PHPMailer(true);
 
     try {
@@ -39,36 +65,10 @@ function sendMail($email, $name, $msg, $login){
 
         $mail->send();
     } catch (Exception $e) {
-        echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
+        $errors['confirm'] = "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
     }
 }
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // 1. Sanitisation
-    $email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
-    $name = test_input($_POST['fullname']);
-    $msg = test_input($_POST['msg']);
-
-    // 2. Validation    
-    if (empty($name)) {
-        $errors['fullname'] = "Name is required. <br />";
-    } else if (!preg_match("/^([a-zA-Z' ]+)$/", $name)){
-        $errors['fullname'] = "This name is invalid. <br />";
-    }
-    if (empty($email)) {
-        $errors['email'] = "Email is required <br />";
-    } else if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $errors['email'] = "Invalid email format <br />"; 
-    }
-
-    // 3. execution
-    if (count($errors)> 0){
-        $errors['confirm'] = "There are still errors";
-    } else {
-        sendMail($email, $name, $msg, $login);
-        $errors['confirm'] = "Email is sent";
-    }
-}
 
 unset($email, $msg , $name);
 ?>
